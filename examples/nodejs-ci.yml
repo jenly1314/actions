@@ -25,7 +25,7 @@ jobs:
       node-version: '20'
       enable-codeql: true
       enable-dependency-review: true
-      codeql-languages: 'javascript'
+      codeql-languages: '["javascript"]'
 
   code-quality:
     needs: build-and-test

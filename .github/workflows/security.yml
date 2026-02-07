@@ -34,10 +34,10 @@ on:
         type: boolean
         default: true
       codeql-languages:
-        description: 'Languages for CodeQL analysis (comma-separated)'
+        description: 'Languages for CodeQL analysis (JSON array format: ["javascript", "python"])'
         required: false
         type: string
-        default: ''
+        default: '["javascript"]'
 
 jobs:
   codeql:
@@ -50,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ${{ fromJSON(inputs.codeql-languages != '' && format('["{0}"]', inputs.codeql-languages) || '["javascript"]') }}
+        language: ${{ fromJSON(inputs.codeql-languages) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

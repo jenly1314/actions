@@ -111,7 +111,7 @@ jobs:
     with:
       enable-codeql: true
       enable-dependency-review: true
-      codeql-languages: 'javascript,python'
+      codeql-languages: '["javascript", "python"]'
 ```
 
 **Inputs:**
@@ -121,7 +121,7 @@ jobs:
 - `working-directory`: Working directory (default: '.')
 - `enable-codeql`: Enable CodeQL analysis (default: true)
 - `enable-dependency-review`: Enable dependency review (default: true)
-- `codeql-languages`: Languages for CodeQL (comma-separated)
+- `codeql-languages`: Languages for CodeQL (JSON array format, e.g., '["javascript", "python"]')
 
 ### 4. Code Quality Workflow (`code-quality.yml`)
 
@@ -239,7 +239,7 @@ jobs:
   security:
     uses: jenly1314/actions/.github/workflows/security.yml@main
     with:
-      codeql-languages: 'javascript'
+      codeql-languages: '["javascript"]'
 ```
 
 ### Python Project

@@ -23,7 +23,7 @@ jobs:
     with:
       python-version: '3.11'
       enable-codeql: true
-      codeql-languages: 'python'
+      codeql-languages: '["python"]'
 
   code-quality:
     needs: build-and-test
