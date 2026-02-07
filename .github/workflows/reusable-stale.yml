@@ -33,3 +33,6 @@ jobs:
           exempt-issue-labels: ${{ inputs.exempt-labels }}
           exempt-pr-labels: ${{ inputs.exempt-labels }}
           exempt-all-pr-milestones: true
+          stale-issue-message: |
+            This issue is stale because it has been open ${{ inputs.days-before-stale }} days with no activity.
+            Remove stale label or comment or this will be closed in ${{ inputs.days-before-close }} days.
