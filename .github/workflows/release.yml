@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '18'
+      java-version:
+        description: 'Java version to use'
+        required: false
+        type: string
+        default: ''
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: ''
+      go-version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: ''
+      working-directory:
+        description: 'Working directory for the build'
+        required: false
+        type: string
+        default: '.'
+      build-command:
+        description: 'Command to build the project'
+        required: false
+        type: string
+        default: ''
+      release-command:
+        description: 'Command to create release artifacts'
+        required: false
+        type: string
+        default: ''
+      artifact-path:
+        description: 'Path to artifacts to upload'
+        required: false
+        type: string
+        default: ''
+      create-github-release:
+        description: 'Create a GitHub release'
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      npm-token:
+        description: 'NPM token for publishing'
+        required: false
+      pypi-token:
+        description: 'PyPI token for publishing'
+        required: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        if: inputs.node-version != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup Java
+        if: inputs.java-version != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ inputs.java-version }}
+
+      - name: Setup Python
+        if: inputs.python-version != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Setup Go
+        if: inputs.go-version != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+
+      - name: Run build
+        if: inputs.build-command != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.build-command }}
+
+      - name: Run release
+        if: inputs.release-command != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.release-command }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm-token }}
+
+      - name: Upload artifacts
+        if: inputs.artifact-path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: ${{ inputs.artifact-path }}
+
+      - name: Create GitHub Release
+        if: inputs.create-github-release && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ inputs.artifact-path }}
+          generate_release_notes: true

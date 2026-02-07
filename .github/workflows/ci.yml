@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '18'
+      java-version:
+        description: 'Java version to use'
+        required: false
+        type: string
+        default: ''
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: ''
+      go-version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: ''
+      working-directory:
+        description: 'Working directory for the build'
+        required: false
+        type: string
+        default: '.'
+      build-command:
+        description: 'Command to build the project'
+        required: false
+        type: string
+        default: ''
+      test-command:
+        description: 'Command to run tests'
+        required: false
+        type: string
+        default: ''
+      lint-command:
+        description: 'Command to run linting'
+        required: false
+        type: string
+        default: ''
+      cache-dependency-path:
+        description: 'Path to dependency file for caching'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: inputs.node-version != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: ${{ inputs.cache-dependency-path != '' && 'npm' || '' }}
+          cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+      - name: Setup Java
+        if: inputs.java-version != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ inputs.java-version }}
+
+      - name: Setup Python
+        if: inputs.python-version != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Setup Go
+        if: inputs.go-version != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+
+      - name: Run build
+        if: inputs.build-command != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.build-command }}
+
+      - name: Run lint
+        if: inputs.lint-command != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.lint-command }}
+
+      - name: Run tests
+        if: inputs.test-command != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.test-command }}

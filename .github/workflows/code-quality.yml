@@ -1,0 +1,94 @@
+name: Code Quality
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '18'
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: ''
+      working-directory:
+        description: 'Working directory'
+        required: false
+        type: string
+        default: '.'
+      enable-sonarcloud:
+        description: 'Enable SonarCloud analysis'
+        required: false
+        type: boolean
+        default: false
+      sonar-project-key:
+        description: 'SonarCloud project key'
+        required: false
+        type: string
+        default: ''
+      sonar-organization:
+        description: 'SonarCloud organization'
+        required: false
+        type: string
+        default: ''
+      coverage-command:
+        description: 'Command to generate coverage report'
+        required: false
+        type: string
+        default: ''
+      coverage-path:
+        description: 'Path to coverage report'
+        required: false
+        type: string
+        default: 'coverage/lcov.info'
+    secrets:
+      sonar-token:
+        description: 'SonarCloud token'
+        required: false
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        if: inputs.node-version != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Setup Python
+        if: inputs.python-version != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Generate coverage
+        if: inputs.coverage-command != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.coverage-command }}
+
+      - name: Upload coverage to Codecov
+        if: inputs.coverage-command != ''
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ inputs.coverage-path }}
+          fail_ci_if_error: false
+
+      - name: SonarCloud Scan
+        if: inputs.enable-sonarcloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.sonar-token }}
+        with:
+          projectBaseDir: ${{ inputs.working-directory }}
+          args: >
+            -Dsonar.projectKey=${{ inputs.sonar-project-key }}
+            -Dsonar.organization=${{ inputs.sonar-organization }}
