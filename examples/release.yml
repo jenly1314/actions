@@ -1,0 +1,33 @@
+# Example: Release Workflow
+
+# .github/workflows/release.yml
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    uses: jenly1314/actions/.github/workflows/release.yml@main
+    with:
+      node-version: '20'
+      build-command: 'npm ci && npm run build'
+      release-command: 'npm publish --access public'
+      artifact-path: 'dist/**'
+      create-github-release: true
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
+
+  docker-release:
+    needs: release
+    uses: jenly1314/actions/.github/workflows/docker.yml@main
+    with:
+      docker-image: 'ghcr.io/${{ github.repository }}'
+      dockerfile-path: 'Dockerfile'
+      platforms: 'linux/amd64,linux/arm64'
+      push: true
+    secrets:
+      registry-username: ${{ github.actor }}
+      registry-password: ${{ secrets.GITHUB_TOKEN }}

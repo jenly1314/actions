@@ -1,0 +1,36 @@
+# Example: Node.js Project CI/CD
+
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    uses: jenly1314/actions/.github/workflows/ci.yml@main
+    with:
+      node-version: '20'
+      build-command: 'npm ci && npm run build'
+      test-command: 'npm test'
+      lint-command: 'npm run lint'
+      cache-dependency-path: 'package-lock.json'
+
+  security-scan:
+    uses: jenly1314/actions/.github/workflows/security.yml@main
+    with:
+      node-version: '20'
+      enable-codeql: true
+      enable-dependency-review: true
+      codeql-languages: 'javascript'
+
+  code-quality:
+    needs: build-and-test
+    uses: jenly1314/actions/.github/workflows/code-quality.yml@main
+    with:
+      node-version: '20'
+      coverage-command: 'npm run test:coverage'
+      coverage-path: 'coverage/lcov.info'

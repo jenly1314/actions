@@ -1,0 +1,28 @@
+# Example: Docker Build and Push
+
+# .github/workflows/docker.yml
+name: Docker Build
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docker:
+    uses: jenly1314/actions/.github/workflows/docker.yml@main
+    with:
+      docker-image: 'ghcr.io/${{ github.repository }}'
+      dockerfile-path: 'Dockerfile'
+      context: '.'
+      platforms: 'linux/amd64,linux/arm64'
+      push: ${{ github.event_name != 'pull_request' }}
+      build-args: |
+        VERSION=${{ github.ref_name }}
+        BUILD_DATE=${{ github.event.head_commit.timestamp }}
+    secrets:
+      registry-username: ${{ github.actor }}
+      registry-password: ${{ secrets.GITHUB_TOKEN }}

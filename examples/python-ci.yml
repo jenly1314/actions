@@ -1,0 +1,34 @@
+# Example: Python Project CI/CD
+
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    uses: jenly1314/actions/.github/workflows/ci.yml@main
+    with:
+      python-version: '3.11'
+      build-command: 'pip install -r requirements.txt'
+      test-command: 'pytest --cov'
+      lint-command: 'flake8 . && black --check .'
+
+  security-scan:
+    uses: jenly1314/actions/.github/workflows/security.yml@main
+    with:
+      python-version: '3.11'
+      enable-codeql: true
+      codeql-languages: 'python'
+
+  code-quality:
+    needs: build-and-test
+    uses: jenly1314/actions/.github/workflows/code-quality.yml@main
+    with:
+      python-version: '3.11'
+      coverage-command: 'pytest --cov --cov-report=xml'
+      coverage-path: 'coverage.xml'
