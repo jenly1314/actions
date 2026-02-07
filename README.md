@@ -1,2 +1,2 @@
-# actions
+# Actions
 Reusable GitHub Actions workflows for development.
