@@ -1,0 +1,71 @@
+name: Reusable Docs
+
+on:
+  workflow_call:
+    inputs:
+      java-version-file:
+        description: 'Path to the .java-version or .sdkmanrc file.'
+        required: true
+        type: string
+      python-version:
+        description: 'Python version to use.'
+        required: false
+        type: string
+        default: '3.x'
+      pip-install-command:
+        description: 'Command to install Python dependencies (e.g., `pip install mkdocs-material`).'
+        required: false
+        type: string
+        default: 'pip install mkdocs-material'
+      docs-generate-command:
+        description: 'Command to generate the documentation.'
+        required: false
+        type: string
+        default: './build_docs.sh'
+      output-path:
+        description: 'Path to the generated docs directory.'
+        required: false
+        type: string
+        default: 'site'
+
+jobs:
+  docs:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version-file: ${{ inputs.java-version-file }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install Dependencies
+        run: ${{ inputs.pip-install-command }}
+
+      - name: Generate Documentation
+        run: ${{ inputs.docs-generate-command }}
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ inputs.output-path }}
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
