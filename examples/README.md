@@ -41,5 +41,5 @@ with:
 ### Multiple Language Support
 ```yaml
 with:
-  codeql-languages: 'javascript,python'
+  codeql-languages: '["javascript", "python"]'
 ```
