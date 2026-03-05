@@ -4,8 +4,8 @@ on:
   workflow_call:
     inputs:
       version-name:
-        description: 'Version name.'
-        required: true
+        description: 'Version name (defaults to gradle.properties)'
+        required: false
         type: string
       release-body:
         description: 'Release notes.'
@@ -21,11 +21,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Determine version
+        id: get-version
+        run: |
+          if [ -n "${{ inputs.version-name }}" ]; then
+            echo "Using provided version: ${{ inputs.version-name }}"
+            echo "VERSION_NAME=${{ inputs.version-name }}" >> $GITHUB_ENV
+          else
+            VERSION_NAME=$(grep '^VERSION_NAME=' gradle.properties | cut -d'=' -f2)
+            echo "Using version from gradle.properties: $VERSION_NAME"
+            echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          fi
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.version-name }}
-          name: ${{ inputs.version-name }}
+          tag_name: ${{ env.VERSION_NAME }}
+          name: ${{ env.VERSION_NAME }}
           body: ${{ inputs.release-body }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
