@@ -8,8 +8,8 @@ on:
         required: false
         type: string
       release-body:
-        description: 'Release notes.'
-        required: true
+        description: 'Release notes (defaults to CHANGELOG.md)'
+        required: false
         type: string
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine version
+      - name: Determine version name
         id: get-version
         run: |
           if [ -n "${{ inputs.version-name }}" ]; then
@@ -33,11 +33,23 @@ jobs:
             echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
           fi
 
+      - name: Set release body
+        id: get-release-body
+        run: |
+          if [ -n "${{ inputs.release-body }}" ]; then
+            echo "Using provided release body"
+            echo "RELEASE_BODY=${{ inputs.release-body }}" >> $GITHUB_ENV
+          else
+            release_body=$(awk '/^####/{if(f)exit; f=1; next} f' CHANGELOG.md)
+            echo "Using release notes from CHANGELOG.md"
+            echo "RELEASE_BODY=$release_body" >> $GITHUB_ENV
+          fi
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION_NAME }}
           name: ${{ env.VERSION_NAME }}
-          body: ${{ inputs.release-body }}
+          body: ${{ env.RELEASE_BODY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
