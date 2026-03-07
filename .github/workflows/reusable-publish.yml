@@ -3,6 +3,10 @@ name: Reusable Publish
 on:
   workflow_call:
     inputs:
+      java-version:
+        description: 'Java version (takes precedence over java-version-file)'
+        required: false
+        type: string
       java-version-file:
         description: 'Path to the .java-version or .sdkmanrc file.'
         required: true
@@ -38,6 +42,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
+          java-version: ${{ inputs.java-version }}
           java-version-file: ${{ inputs.java-version-file }}
 
       - name: Setup Gradle
