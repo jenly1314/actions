@@ -33,11 +33,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -B ${{ inputs.branch-name }}
           git push origin ${{ inputs.branch-name }}
+          echo "Branch ${{ inputs.branch-name }} synced."
 
       - name: Create Release
         run: |
           gh release create ${{ inputs.tag-name }} \
             --title "${{ inputs.tag-name }}" \
             --notes "${{ inputs.release-notes }}"
+          echo "Release ${{ inputs.tag-name }} created."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
