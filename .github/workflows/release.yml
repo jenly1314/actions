@@ -3,12 +3,12 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      tag-name:
-        description: 'Tag to release (e.g., v1.0.0)'
-        required: true
-        type: string
       branch-name:
         description: 'Branch to sync (e.g., v1)'
+        required: true
+        type: string
+      tag-name:
+        description: 'Tag to release (e.g., v1.0.0)'
         required: true
         type: string
       release-notes:
