@@ -21,8 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine version name
-        id: get-version
+      - name: Get Version
         run: |
           if [ -n "${{ inputs.version-name }}" ]; then
             echo "Using provided version: ${{ inputs.version-name }}"
@@ -32,9 +31,9 @@ jobs:
             echo "Using version from gradle.properties: $VERSION_NAME"
             echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
           fi
+          echo "Version: ${{ env.VERSION_NAME }}"
 
-      - name: Set release body
-        id: get-release-body
+      - name: Get Release Notes
         run: |
           if [ -n "${{ inputs.release-body }}" ]; then
             echo "Using provided release body"
@@ -44,8 +43,9 @@ jobs:
             echo "Using release notes from CHANGELOG.md"
             echo "RELEASE_BODY=$release_body" >> $GITHUB_ENV
           fi
+          echo "Release notes: ${{ env.RELEASE_BODY }}"
 
-      - name: Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION_NAME }}

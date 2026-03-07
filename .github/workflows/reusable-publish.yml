@@ -48,7 +48,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Run Gradle Publish
+      - name: Publish with Gradle
         run: ${{ inputs.gradle-command }}
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.maven-username }}
