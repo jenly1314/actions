@@ -37,8 +37,8 @@ jobs:
         run: |
           if [ -n "${{ inputs.release-body }}" ]; then
               echo "Using provided release body"
-              RAW_BODY="${{ inputs.release-body }}"
-              RELEASE_BODY=$(echo "$RAW_BODY" | sed 's/ - /\n- /g; s/ \* /\n* /g')
+              printf -v RAW_BODY "%s" "${{ inputs.release-body }}"
+              RELEASE_BODY=$(printf "%s" "$RAW_BODY" | sed 's/ - /\n- /g; s/ \* /\n* /g')
               {
                 echo "RELEASE_BODY<<EOF"
                 echo "$RELEASE_BODY"
