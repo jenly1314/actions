@@ -31,23 +31,29 @@ jobs:
             echo "Using version from gradle.properties: $VERSION_NAME"
             echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
           fi
-          echo "Version: ${{ env.VERSION_NAME }}"
+          echo "Version: $VERSION_NAME"
 
       - name: Get Release Notes
         run: |
           if [ -n "${{ inputs.release-body }}" ]; then
             echo "Using provided release body"
-            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
-            echo "${{ inputs.release-body }}" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            RELEASE_BODY="${{ inputs.release-body }}"
+            {
+              echo "RELEASE_BODY<<EOF"
+              echo "$RELEASE_BODY"
+              echo "EOF"
+            } >> $GITHUB_ENV
           else
-            release_body=$(awk '/^####/{if(f)exit; f=1; next} f' CHANGELOG.md)
+            RELEASE_BODY=$(awk '/^####/{if(f)exit; f=1; next} f' CHANGELOG.md)
             echo "Using release notes from CHANGELOG.md"
-            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
-            echo "$release_body" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            {
+              echo "RELEASE_BODY<<EOF"
+              echo "$RELEASE_BODY"
+              echo "EOF"
+            } >> $GITHUB_ENV
           fi
-          echo "Release notes: ${{ env.RELEASE_BODY }}"
+          echo "Release notes:"
+          echo "$RELEASE_BODY"
 
       - name: Release
         uses: softprops/action-gh-release@v2
