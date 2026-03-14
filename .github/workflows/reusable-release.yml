@@ -37,11 +37,15 @@ jobs:
         run: |
           if [ -n "${{ inputs.release-body }}" ]; then
             echo "Using provided release body"
-            echo "RELEASE_BODY=${{ inputs.release-body }}" >> $GITHUB_ENV
+            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+            echo "${{ inputs.release-body }}" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
           else
             release_body=$(awk '/^####/{if(f)exit; f=1; next} f' CHANGELOG.md)
             echo "Using release notes from CHANGELOG.md"
-            echo "RELEASE_BODY=$release_body" >> $GITHUB_ENV
+            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+            echo "$release_body" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
           fi
           echo "Release notes: ${{ env.RELEASE_BODY }}"
 
