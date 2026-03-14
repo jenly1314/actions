@@ -36,21 +36,22 @@ jobs:
       - name: Get Release Notes
         run: |
           if [ -n "${{ inputs.release-body }}" ]; then
-            echo "Using provided release body"
-            RELEASE_BODY="${{ inputs.release-body }}"
-            {
-              echo "RELEASE_BODY<<EOF"
-              echo "$RELEASE_BODY"
-              echo "EOF"
-            } >> $GITHUB_ENV
+              echo "Using provided release body"
+              RAW_BODY="${{ inputs.release-body }}"
+              RELEASE_BODY=$(echo "$RAW_BODY" | sed -e 's/ - /\n- /g' -e 's/ \* /\n* /g')
+              {
+                echo "RELEASE_BODY<<EOF"
+                echo "$RELEASE_BODY"
+                echo "EOF"
+              } >> $GITHUB_ENV
           else
-            RELEASE_BODY=$(awk '/^####/{if(f)exit; f=1; next} f' CHANGELOG.md)
-            echo "Using release notes from CHANGELOG.md"
-            {
-              echo "RELEASE_BODY<<EOF"
-              echo "$RELEASE_BODY"
-              echo "EOF"
-            } >> $GITHUB_ENV
+              RELEASE_BODY=$(awk '/^####/{if(f)exit; f=1; next} f' CHANGELOG.md)
+              echo "Using release notes from CHANGELOG.md"
+              {
+                echo "RELEASE_BODY<<EOF"
+                echo "$RELEASE_BODY"
+                echo "EOF"
+              } >> $GITHUB_ENV
           fi
           echo "Release notes:"
           echo "$RELEASE_BODY"
