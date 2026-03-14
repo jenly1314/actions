@@ -37,9 +37,11 @@ jobs:
 
       - name: Create Release
         run: |
+          RAW_NOTES='${{ inputs.release-notes }}'
+          NOTES=$(echo "$RAW_NOTES" | sed 's/ - /\n- /g; s/ \* /\n* /g')
           gh release create ${{ inputs.tag-name }} \
             --title "${{ inputs.tag-name }}" \
-            --notes "${{ inputs.release-notes }}"
+            --notes "$NOTES"
           echo "Release ${{ inputs.tag-name }} created."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
