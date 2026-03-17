@@ -7,10 +7,12 @@ on:
         description: 'Java version (takes precedence over java-version-file)'
         required: false
         type: string
+        default: '' 
       java-version-file:
         description: 'Path to the .java-version or .sdkmanrc file.'
-        required: true
+        required: false
         type: string
+        default: ''
       gradle-command:
         description: 'Full Gradle command for publishing. Default is for Maven Central.'
         required: false
