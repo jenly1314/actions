@@ -9,7 +9,7 @@ on:
         type: string
 
 jobs:
-  release:
+  sync-branch:
     runs-on: ubuntu-latest
     permissions:
       contents: write
