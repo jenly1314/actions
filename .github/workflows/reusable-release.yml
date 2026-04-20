@@ -11,10 +11,12 @@ on:
         description: 'Release notes (defaults to CHANGELOG.md)'
         required: false
         type: string
-
+        
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6

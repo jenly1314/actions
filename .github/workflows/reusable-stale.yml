@@ -18,10 +18,14 @@ on:
         required: false
         type: string
         default: 'help wanted,bug,enhancement'
-
+        
 jobs:
   stale:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      issues: write
+      pull-requests: write
     steps:
       - name: Cleanup Stale
         uses: actions/stale@v10
